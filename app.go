@@ -1,4 +1,4 @@
-package app
+package goappframe
 
 import (
 	"errors"

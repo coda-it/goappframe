@@ -5,6 +5,9 @@ MAKE=make
 
 .DEFAULT_GOAL := all
 
+all :
+.PHONY : all
+
 .PHONY: install
 install:
 	$(shell cd /; $(GOCMD) get -u golang.org/x/lint/golint)
