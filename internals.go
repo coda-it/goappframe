@@ -10,7 +10,7 @@ import (
 type Internals struct {
 	Port        string
 	Modules     []module.Module
-	Persistence IPersistance
+	Persistence interface{}
 	DataKey     string
 	Mailer      mailer.IMailer
 	NotFound    router.ControllerHandler
