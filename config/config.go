@@ -7,4 +7,5 @@ import (
 // Config - static app config
 type Config struct {
 	Navigation []navigation.Navigation `json:"navigation"`
+	Apps       []App                   `json:"apps"`
 }

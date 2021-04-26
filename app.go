@@ -33,10 +33,14 @@ func New(i Internals) *App {
 		StaticFilesDir: "public",
 	}, i.NotFound, "/login")
 
-	for _, m := range i.Modules {
-		if m.Enabled {
-			for _, r := range m.Routes {
-				server.Router.AddRoute(r.Path, r.Method, r.Protected, r.Handler)
+	for _, appConfig := range i.Config.Apps {
+		for _, moduleConfig := range appConfig.Modules {
+			for _, moduleInstance := range i.Modules {
+				if moduleInstance.Enabled || moduleConfig.ID == moduleInstance.ID {
+					for _, r := range moduleInstance.Routes {
+						server.Router.AddRoute(r.Path, r.Method, r.Protected, r.Handler)
+					}
+				}
 			}
 		}
 	}
@@ -50,6 +54,6 @@ func New(i Internals) *App {
 }
 
 // Run - runs WebServer process
-func (ws *App) Run() {
-	ws.server.Run()
+func (app *App) Run() {
+	app.server.Run()
 }

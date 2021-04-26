@@ -6,6 +6,7 @@ import (
 
 // Module - application module
 type Module struct {
+	ID      string
 	Enabled bool
 	Routes  []route.Route
 }
