@@ -31,6 +31,8 @@ func New(i Internals) *App {
 		Port:           addr,
 		StaticFilesURL: "/static/",
 		StaticFilesDir: "public",
+		Cert:           i.Cert,
+		CertPrvKey:     i.CertPrvKey,
 	}, i.NotFound, "/login")
 
 	for _, appConfig := range i.Config.Apps {
