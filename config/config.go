@@ -8,4 +8,6 @@ import (
 type Config struct {
 	Navigation []navigation.Navigation `json:"navigation"`
 	Apps       []App                   `json:"apps"`
+	Cert       string                  `json:"certificate`
+	CertPrvKey string                  `json:"certificatePrivateKey`
 }
