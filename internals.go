@@ -16,6 +16,4 @@ type Internals struct {
 	DataKey     string
 	Mailer      mailer.IMailer
 	NotFound    router.ControllerHandler
-	Cert        string
-	CertPrvKey  string
 }
