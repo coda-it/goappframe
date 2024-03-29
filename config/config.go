@@ -9,6 +9,6 @@ type Config struct {
 	Navigation      []navigation.Navigation `json:"navigation"`
 	Apps            []App                   `json:"apps"`
 	DefaultLanguage string                  `json:"defaultLanguage"`
-	Cert            string                  `json:"certificate`
-	CertPrvKey      string                  `json:"certificatePrivateKey`
+	Cert            string                  `json:"certificate"`
+	CertPrvKey      string                  `json:"certificatePrivateKey"`
 }
