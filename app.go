@@ -22,7 +22,7 @@ func getServerAddress(port string) (string, error) {
 
 func checkerHandler(domain string) func(req *http.Request) bool {
 	return func(req *http.Request) bool {
-		if domain != "" && req.Host == domain {
+		if domain == "" || (domain != "" && req.Host == domain) {
 			return true
 		}
 
