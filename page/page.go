@@ -16,4 +16,5 @@ type Page struct {
 	JSTranslations  string
 	FeatureFlags    map[string]bool
 	JSFeaturesFlags string
+	AppId           string
 }

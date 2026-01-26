@@ -1,6 +1,6 @@
 module github.com/coda-it/goappframe
 
-go 1.13
+go 1.23.0
 
 require (
 	github.com/coda-it/goutils v0.1.0
