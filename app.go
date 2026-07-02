@@ -2,9 +2,13 @@ package goappframe
 
 import (
 	"errors"
+	"net/http"
+
+	"github.com/coda-it/goappframe/config"
+	"github.com/coda-it/goappframe/module"
 	"github.com/coda-it/goutils/logger"
 	"github.com/coda-it/gowebserver"
-	"net/http"
+	"github.com/coda-it/gowebserver/router"
 )
 
 // App - main application struct
@@ -30,6 +34,29 @@ func checkerHandler(domain string) func(req *http.Request) bool {
 	}
 }
 
+func registerModuleRoutes(addRoute router.AddRouteFunc, cnf config.Config, modules []module.Module) {
+	for _, appConfig := range cnf.Apps {
+		for _, moduleInstance := range modules {
+			enabled := moduleInstance.Enabled
+
+			if !enabled {
+				for _, moduleConfig := range appConfig.Modules {
+					if moduleConfig.ID == moduleInstance.ID {
+						enabled = true
+						break
+					}
+				}
+			}
+
+			if enabled {
+				for _, r := range moduleInstance.Routes {
+					addRoute(r.Path, r.Method, r.Protected, r.Handler, checkerHandler(appConfig.Domain))
+				}
+			}
+		}
+	}
+}
+
 // New - creates new App instance
 func New(i Internals) *App {
 	addr, err := getServerAddress(i.Port)
@@ -46,17 +73,7 @@ func New(i Internals) *App {
 		CertPrvKey:     i.Config.CertPrvKey,
 	}, i.NotFound, "/login")
 
-	for _, appConfig := range i.Config.Apps {
-		for _, moduleConfig := range appConfig.Modules {
-			for _, moduleInstance := range i.Modules {
-				if moduleInstance.Enabled || moduleConfig.ID == moduleInstance.ID {
-					for _, r := range moduleInstance.Routes {
-						server.Router.AddRoute(r.Path, r.Method, r.Protected, r.Handler, checkerHandler(appConfig.Domain))
-					}
-				}
-			}
-		}
-	}
+	registerModuleRoutes(server.Router.AddRoute, i.Config, i.Modules)
 
 	server.AddDataSource(i.DataKey, i.Persistence)
 
@@ -64,6 +81,16 @@ func New(i Internals) *App {
 		server,
 		i,
 	}
+}
+
+// Reconfigure - applies a new config at runtime, atomically rebuilding all
+// routes; server-level options (port, certificates) still require a restart
+func (app *App) Reconfigure(cnf config.Config) {
+	app.internals.Config = cnf
+
+	app.server.Router.ReplaceRoutes(func(addRoute router.AddRouteFunc) {
+		registerModuleRoutes(addRoute, cnf, app.internals.Modules)
+	})
 }
 
 // Run - runs WebServer process
