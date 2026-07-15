@@ -6,6 +6,7 @@ type Navigation struct {
 	Label    string       `json:"label"`
 	Href     string       `json:"href"`
 	IsRoot   bool         `json:"isRoot"`
+	IsAdmin  bool         `json:"isAdmin"`
 	IsLogged bool         `json:"isLogged"`
 	Children []Navigation `json:"children"`
 }
