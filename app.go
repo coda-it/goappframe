@@ -24,13 +24,12 @@ func getServerAddress(port string) (string, error) {
 	return ":" + port, nil
 }
 
-func checkerHandler(domain string) func(req *http.Request) bool {
+func checkerHandler(appConfig config.App) func(req *http.Request) bool {
 	return func(req *http.Request) bool {
-		if domain == "" || (domain != "" && req.Host == domain) {
-			return true
-		}
-
-		return false
+		// An empty primary Domain keeps the catch-all wildcard behavior;
+		// otherwise the request host must match the primary Domain or any
+		// of the configured alias Domains.
+		return appConfig.Domain == "" || appConfig.MatchesDomain(req.Host)
 	}
 }
 
@@ -50,7 +49,7 @@ func registerModuleRoutes(addRoute router.AddRouteFunc, cnf config.Config, modul
 
 			if enabled {
 				for _, r := range moduleInstance.Routes {
-					addRoute(r.Path, r.Method, r.Protected, r.Handler, checkerHandler(appConfig.Domain))
+					addRoute(r.Path, r.Method, r.Protected, r.Handler, checkerHandler(appConfig))
 				}
 			}
 		}

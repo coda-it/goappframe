@@ -36,6 +36,54 @@ func configWithModules(moduleIDs ...string) config.Config {
 	}
 }
 
+func TestRoutesAreServedForAliasDomains(t *testing.T) {
+	postModule := module.Module{
+		ID: "post",
+		Routes: []route.Route{
+			{
+				Path:    "/post",
+				Method:  "GET",
+				Handler: contentHandler("post handler"),
+			},
+		},
+	}
+
+	cnf := config.Config{
+		Apps: []config.App{
+			{
+				ID:      "default",
+				Domain:  "app.example.com",
+				Domains: []string{"www.example.com"},
+				Modules: []config.Module{{ID: "post"}},
+			},
+		},
+	}
+
+	app := New(Internals{
+		Port:     "8080",
+		Config:   cnf,
+		Modules:  []module.Module{postModule},
+		NotFound: contentHandler("not found"),
+	})
+
+	cases := map[string]string{
+		"app.example.com":     "post handler",
+		"www.example.com":     "post handler",
+		"unlisted.example.com": "not found",
+	}
+
+	for host, expectedBody := range cases {
+		request, _ := http.NewRequest(http.MethodGet, "/post", nil)
+		request.Host = host
+		writer := httptest.NewRecorder()
+		app.server.Router.Route(writer, request)
+
+		if writer.Body.String() != expectedBody {
+			t.Errorf("host %q routed to %q, expected %q", host, writer.Body.String(), expectedBody)
+		}
+	}
+}
+
 func TestReconfigure(t *testing.T) {
 	postModule := module.Module{
 		ID: "post",
