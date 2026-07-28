@@ -67,8 +67,8 @@ func TestRoutesAreServedForAliasDomains(t *testing.T) {
 	})
 
 	cases := map[string]string{
-		"app.example.com":     "post handler",
-		"www.example.com":     "post handler",
+		"app.example.com":      "post handler",
+		"www.example.com":      "post handler",
 		"unlisted.example.com": "not found",
 	}
 
